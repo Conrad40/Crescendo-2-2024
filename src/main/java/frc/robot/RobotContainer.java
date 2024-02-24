@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Commands.NoteIntake;
+import frc.robot.Commands.RetractIntake;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
@@ -83,6 +84,10 @@ public class RobotContainer {
     .whileTrue(new NoteIntake(m_Intake)
             .unless(() -> m_Intake.isNoteIn())
     );
+    m_driverController.a().whileTrue(new RetractIntake(m_Intake));
+
+
+    //make command to deploy intake and spit note out of intake
   }
 
   /**

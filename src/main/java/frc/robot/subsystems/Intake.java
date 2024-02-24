@@ -41,6 +41,8 @@ public class Intake extends SubsystemBase {
 
     m_forwardLimit = m_liftMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
     m_reverseLimit = m_liftMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+
+    m_liftMotor.setInverted(true);
   }
 
   @Override
@@ -63,7 +65,7 @@ public class Intake extends SubsystemBase {
 
   // the reason for .2 is to test the limit switch before having it go fast
   public void dropIntake() {
-    m_liftMotor.set(.2);
+    m_liftMotor.set(.8);
   }
 
   public void stopIntake() {
@@ -71,7 +73,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void retractIntake() {
-    m_liftMotor.set(-.2);
+    m_liftMotor.set(-.8);
   }
 
   public boolean isNoteIn(){
