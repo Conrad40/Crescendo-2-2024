@@ -28,10 +28,13 @@ public class Intake extends SubsystemBase {
   // any code from me, further testing/research is needed
   private SparkLimitSwitch m_forwardLimit;
   private SparkLimitSwitch m_reverseLimit;
+  private SparkLimitSwitch m_isNoteIn;
 
   public Intake() {
     m_spinMotor = new CANSparkMax(CANIDConstants.kINTAKE_SPIN_MOTOR_ID, MotorType.kBrushless);
     m_liftMotor = new CANSparkMax(CANIDConstants.kINTAKE_LIFT_MOTOR_ID, MotorType.kBrushless);
+
+    m_isNoteIn = m_spinMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
 
     m_spinMotor.setIdleMode(IdleMode.kCoast);
     m_liftMotor.setIdleMode(IdleMode.kBrake);
@@ -69,5 +72,9 @@ public class Intake extends SubsystemBase {
 
   public void retractIntake() {
     m_liftMotor.set(-.2);
+  }
+
+  public boolean isNoteIn(){
+    return m_isNoteIn.isPressed();
   }
 }
