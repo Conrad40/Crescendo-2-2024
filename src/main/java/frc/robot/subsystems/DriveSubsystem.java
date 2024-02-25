@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import frc.robot.Constants.CANIDConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Libraries.MAXSwerveModule;
 import frc.robot.Libraries.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 

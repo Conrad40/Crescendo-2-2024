@@ -47,6 +47,9 @@ public final class Constants {
     public static final int kINTAKE_LIFT_MOTOR_ID = 20;
     public static final int kINTAKE_SPIN_MOTOR_ID = 21;
 
+    public static final int kLEFT_CLIMB_MOTOR_ID = 30;
+    public static final int kRIGHT_CLIMB_MOTOR_ID = 31;
+
 }
 
   public static final class DriveConstants {

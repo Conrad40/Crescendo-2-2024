@@ -20,6 +20,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -43,6 +44,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
     private final Shooter m_Shooter = new Shooter();
     private final Intake m_Intake = new Intake();
+    private final Climber m_Climber = new Climber();
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
 
@@ -50,9 +52,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    m_Shooter.setDefaultCommand(Commands.run(
-        () -> m_Shooter.Shoot(MathUtil.applyDeadband(m_driverController.getLeftTriggerAxis(), .5) * .5 + .5),
-        m_Shooter));
+    
+    
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -88,6 +89,13 @@ public class RobotContainer {
 
 
     //make command to deploy intake and spit note out of intake
+
+    m_driverController.povUp().whileTrue(new RunCommand(()-> m_Climber.Up()));
+    m_driverController.povDown().whileTrue(new RunCommand(()-> m_Climber.Down()));
+    m_driverController.povLeft().whileTrue(new RunCommand(()-> m_Climber.Left()));
+    m_driverController.povRight().whileTrue(new RunCommand(()-> m_Climber.Right()));
+m_driverController.povCenter().onTrue(new RunCommand(() -> m_Climber.Stop()));
+
   }
 
   /**
