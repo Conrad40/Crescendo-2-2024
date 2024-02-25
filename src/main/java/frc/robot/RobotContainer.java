@@ -14,8 +14,12 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
+//import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Commands.DeployIntake;
 import frc.robot.Commands.NoteIntake;
 import frc.robot.Commands.RetractIntake;
+import frc.robot.Commands.ShootNote;
+import frc.robot.Commands.WaitForCount;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
@@ -26,6 +30,7 @@ import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -50,9 +55,9 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    m_Shooter.setDefaultCommand(Commands.run(
-        () -> m_Shooter.Shoot(MathUtil.applyDeadband(m_driverController.getLeftTriggerAxis(), .5) * .5 + .5),
-        m_Shooter));
+    //m_Shooter.setDefaultCommand(Commands.run(
+        //() -> m_Shooter.Shoot(MathUtil.applyDeadband(m_driverController.getLeftTriggerAxis(), .5) * .5 + .5),
+       // m_Shooter));
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -79,15 +84,30 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
+
+
     m_driverController
-    .b()
-    .whileTrue(new NoteIntake(m_Intake)
-            .unless(() -> m_Intake.isNoteIn())
-    );
-    m_driverController.a().whileTrue(new RetractIntake(m_Intake));
+        .leftBumper() 
+        .whileTrue(new DeployIntake(m_Intake)
+            .andThen( new NoteIntake(m_Intake)
+                .unless(() -> m_Intake.isNoteIn())
+            .andThen(new RetractIntake(m_Intake))));
+//should deploy then run intake until a note is in it and then stops pulling note and retracts intake. 
+//but might retract intake anyway if the bumper is no longer being held.
 
-
+    m_driverController
+    .a()
+    .whileTrue(new RetractIntake(m_Intake));
     //make command to deploy intake and spit note out of intake
+
+    m_driverController
+    .leftTrigger(.75)
+    .whileTrue(new RetractIntake(m_Intake).andThen(new ShootNote(m_Shooter, m_Intake)));
+    //Retracts Intake, starts shooter motors, waits N seconds (currently 1), has intake spit note into shooter, then waits .25 seconds to let note leave.
+
+    m_driverController 
+    .b()
+    .whileTrue(new RunCommand(() -> m_Intake.dropNote()));
   }
 
   /**
