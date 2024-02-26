@@ -64,7 +64,7 @@ public class Intake extends SubsystemBase {
   }
 
   // the reason for .2 is to test the limit switch before having it go fast
-  public void dropIntake() {
+  public void deployIntake() {
     m_liftMotor.set(.8);
   }
 
@@ -75,6 +75,14 @@ public class Intake extends SubsystemBase {
   public void retractIntake() {
     m_liftMotor.set(-.8);
   }
+
+//IsOut and isIn might be sending the wrong limitswitch, testing should be done.
+public boolean isOut(){
+  return m_forwardLimit.isPressed();
+}
+public boolean isIn(){
+  return m_reverseLimit.isPressed();
+}
 
   public boolean isNoteIn(){
     return m_isNoteIn.isPressed();

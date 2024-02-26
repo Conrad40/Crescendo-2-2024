@@ -4,41 +4,42 @@
 
 package frc.robot.Commands;
 
+import edu.wpi.first.wpilibj.Timer;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake;
 
-public class RetractIntake extends Command {
+public class WaitForCount extends Command {
+  /** Creates a new WaitForCount. */
 
-  private Intake m_intake;
-
-  /** Creates a new RetractIntake. */
-  public RetractIntake(Intake intake) {
-    m_intake = intake;
-
+  //the old code had this, I grabed it because I mistakenly thought it would be useful for the shooting command. I am keeping it because it is also used in auto.
+  //I did simplfy it from the old code.
+  private Timer m_timer = new Timer();
+  double m_duration;
+  public WaitForCount(double duration) {
+    m_duration = duration;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.retractIntake();
+    m_timer.reset();
+    m_timer.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.stopIntake();
+    m_timer.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_intake.isIn();
+    return m_timer.hasElapsed(m_duration);
   }
 }
