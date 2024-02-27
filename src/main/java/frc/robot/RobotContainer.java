@@ -68,8 +68,8 @@ public class RobotContainer {
                     // Multiply by max speed to map the joystick unitless inputs to actual units.
                     // This will map the [-1, 1] to [max speed backwards, max speed forwards],
                     // converting them to actual units.
- .5 * MathUtil.applyDeadband(-m_driverController.getLeftY(), .08),
-                                .5 * -MathUtil.applyDeadband(m_driverController.getLeftX(), .08),
+ .5 * -MathUtil.applyDeadband(-m_driverController.getLeftY(), .08),
+                                .5 * MathUtil.applyDeadband(m_driverController.getLeftX(), .08),
                                 .5 * -MathUtil.applyDeadband(m_driverController.getRightX(), .08),
                    
                     false,false),
@@ -90,8 +90,8 @@ public class RobotContainer {
         .leftBumper() 
         .whileTrue(new DeployIntake(m_Intake)
             .andThen( new NoteIntake(m_Intake)
-                .unless(() -> m_Intake.isNoteIn())
-            .andThen(new RetractIntake(m_Intake))));
+                .unless(() -> m_Intake.isNoteIn()))
+            .andThen(new RetractIntake(m_Intake)));
 //should deploy then run intake until a note is in it and then stops pulling note and retracts intake. 
 //but might retract intake anyway if the bumper is no longer being held.
 
@@ -108,6 +108,9 @@ public class RobotContainer {
     m_driverController 
     .b()
     .whileTrue(new RunCommand(() -> m_Intake.dropNote()));
+    m_driverController 
+    .b()
+    .onFalse(new RunCommand(() -> m_Intake.holdNote()));
   }
 
   /**

@@ -36,7 +36,7 @@ public class Intake extends SubsystemBase {
 
     m_isNoteIn = m_spinMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
 
-    m_spinMotor.setIdleMode(IdleMode.kCoast);
+    m_spinMotor.setIdleMode(IdleMode.kBrake);
     m_liftMotor.setIdleMode(IdleMode.kBrake);
 
     m_forwardLimit = m_liftMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);

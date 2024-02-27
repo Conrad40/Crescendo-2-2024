@@ -28,6 +28,8 @@ m_Intake = intake;
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_timer.reset();
+    m_timer.start();
     m_shooter.Shoot(ShooterConstants.kSHOOT_SPEED);
   }
 
@@ -46,6 +48,7 @@ m_Intake.dropNote();
   public void end(boolean interrupted) {
     m_shooter.Stop();
     m_Intake.holdNote();
+    m_timer.stop();
   }
 
   // Returns true when the command should end.

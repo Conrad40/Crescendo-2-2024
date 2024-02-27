@@ -141,7 +141,7 @@ public final class Constants {
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
   public static class ShooterConstants {
-    public static final boolean kIS_INVERTED = true;
+    public static final boolean kIS_INVERTED = false;
     public static final double kSHOOT_SPEED = .8;
     public static final double kSPIN_UP_TIME = 1.0;
     }
