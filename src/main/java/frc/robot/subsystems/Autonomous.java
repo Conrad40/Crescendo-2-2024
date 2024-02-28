@@ -38,8 +38,9 @@ import frc.robot.Libraries.StepState;
 //I know it is not ideal but my plan is to make the most simplfied version of the older junk I made last year.
 //Comp is in 4 days so functional is more important then best practice.
 public class Autonomous extends SubsystemBase {
-   enum Paths {
-    BASIC(0, 0, 2.5, 0);
+  enum Paths {
+    BASIC(0, 0, 2.5, 0),
+    BEND(0, 0, 1, .5, 2, 0);
 
     private final double m_dStartX;
     private final double m_DStartY;
@@ -56,29 +57,39 @@ public class Autonomous extends SubsystemBase {
       this.m_dEndX = dEndX;
       this.m_dEndY = dEndY;
     }
+
+    private Paths(double dStartX, double dStartY, double dMidX, double dMidY, double dEndX, double dEndY) {
+      this.m_dStartX = dStartX;
+      this.m_DStartY = dStartY;
+      this.m_DMidX = dMidX;
+      this.m_dMidY = dMidY;
+      this.m_dEndX = dEndX;
+      this.m_dEndY = dEndY;
+    }
+
     double getStartX() {
       return m_dStartX;
-}
+    }
 
-double getStartY() {
+    double getStartY() {
       return m_DStartY;
-}
+    }
 
-double getMidX() {
+    double getMidX() {
       return m_DMidX;
-}
+    }
 
-double getMidY() {
+    double getMidY() {
       return m_dMidY;
-}
+    }
 
-double getEndX() {
+    double getEndX() {
       return m_dEndX;
-}
+    }
 
-double getEndY() {
+    double getEndY() {
       return m_dEndY;
-}
+    }
   }
 
   /** Creates a new Autonomous. */
@@ -184,31 +195,31 @@ double getEndY() {
           .getEntry()
   };
   private GenericEntry m_st[] = { m_tab.add("Stat0", m_strStepStatusList[0])
-  .withPosition(2, 2)
-  .withSize(1, 1)
-  .withWidget(BuiltInWidgets.kTextView)
-  .getEntry(),
-  m_tab.add("Stat1", m_strStepStatusList[1])
-      .withPosition(3, 2)
+      .withPosition(2, 2)
       .withSize(1, 1)
       .withWidget(BuiltInWidgets.kTextView)
       .getEntry(),
-  m_tab.add("Stat2", m_strStepStatusList[2])
-      .withPosition(4, 2)
-      .withSize(1, 1)
-      .withWidget(BuiltInWidgets.kTextView)
-      .getEntry(),
-  m_tab.add("Stat3", m_strStepStatusList[3])
-      .withPosition(5, 2)
-      .withSize(1, 1)
-      .withWidget(BuiltInWidgets.kTextView)
-      .getEntry(),
-  m_tab.add("Stat4", m_strStepStatusList[4])
-      .withPosition(6, 2)
-      .withSize(1, 1)
-      .withWidget(BuiltInWidgets.kTextView)
-      .getEntry()
-};
+      m_tab.add("Stat1", m_strStepStatusList[1])
+          .withPosition(3, 2)
+          .withSize(1, 1)
+          .withWidget(BuiltInWidgets.kTextView)
+          .getEntry(),
+      m_tab.add("Stat2", m_strStepStatusList[2])
+          .withPosition(4, 2)
+          .withSize(1, 1)
+          .withWidget(BuiltInWidgets.kTextView)
+          .getEntry(),
+      m_tab.add("Stat3", m_strStepStatusList[3])
+          .withPosition(5, 2)
+          .withSize(1, 1)
+          .withWidget(BuiltInWidgets.kTextView)
+          .getEntry(),
+      m_tab.add("Stat4", m_strStepStatusList[4])
+          .withPosition(6, 2)
+          .withSize(1, 1)
+          .withWidget(BuiltInWidgets.kTextView)
+          .getEntry()
+  };
   private int m_iPatternSelect;
 
   private Command m_currentCommand;
@@ -233,13 +244,14 @@ double getEndY() {
 
   private Command m_turnPath;
   private StepState m_stepturnPath;
-   private String m_path1JSON = "paths/Path1.wpilib.json";
-   private Trajectory m_trajPath1;
+  private String m_path1JSON = "paths/Path1.wpilib.json";
+  private Trajectory m_trajPath1;
 
   private AutonomousSteps m_currentStepName;
   private StepState[][] m_cmdSteps;
+
   public Autonomous(ConsoleAuto consoleAuto, DriveSubsystem drive) {
-  m_ConsoleAuto = consoleAuto;
+    m_ConsoleAuto = consoleAuto;
     m_drive = drive;
 
     m_selectedCommand = m_autoSelectCommand[0];
@@ -254,25 +266,23 @@ double getEndY() {
 
     m_stepWaitForCount = new StepState(AutonomousSteps.WAITLOOP);
 
-    
-    var thetaController = new ProfiledPIDController(2, 0,0, new Constraints(5, 1));
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    var thetaController = new ProfiledPIDController(2, 0, 0, new Constraints(5, 1));
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-
-  m_drivePath = new SwerveDriveController(readPaths(m_path1JSON),
+    m_drivePath = new SwerveDriveController(readPaths(m_path1JSON),
         kRESET_ODOMETRY, m_drive, thetaController);
     m_autoCommand.addOption(AutonomousSteps.DRIVE, m_drivePath);
     m_stepDrivePath = new StepState(AutonomousSteps.DRIVE,
         m_ConsoleAuto.getSwitchSupplier(3));
-   
-         m_testReadFilePath = new SwerveDriveController(readPaths(m_path1JSON), kRESET_ODOMETRY, drive, thetaController);
-m_autoCommand.addOption(AutonomousSteps.TEST, m_testReadFilePath);
-m_stepTestReadFile = new StepState(AutonomousSteps.TEST);
+
+    m_testReadFilePath = new SwerveDriveController(readPaths(m_path1JSON), kRESET_ODOMETRY, drive, thetaController);
+    m_autoCommand.addOption(AutonomousSteps.TEST, m_testReadFilePath);
+    m_stepTestReadFile = new StepState(AutonomousSteps.TEST);
 
     m_cmdSteps = new StepState[][] {
         { m_stepWaitForCount, m_stepDrivePath }
-//        { m_stepWaitForCount, m_stepTestReadFile }
-       // { m_stepWaitForCount,  m_stepturnPath }
+        // { m_stepWaitForCount, m_stepTestReadFile }
+        // { m_stepWaitForCount, m_stepturnPath }
         // { m_stepWaitForCount, m_stepMoveArm, m_stepPlaceConeM, m_stepDrive3Path }
     };
   }
@@ -295,15 +305,12 @@ m_stepTestReadFile = new StepState(AutonomousSteps.TEST);
       Path trajPath = Filesystem.getDeployDirectory().toPath().resolve(jsonPath);
       trajectory = TrajectoryUtil.fromPathweaverJson(trajPath);
     } catch (IOException ex) {
-System.out.println("Reading the path failed");
+      System.out.println("Reading the path failed");
     }
     return trajectory;
   }
 
-  
-  
   public void selectAutoCommand() {
-
 
     int autoSelectIx = m_ConsoleAuto.getROT_SW_0();
     m_iPatternSelect = autoSelectIx;
@@ -340,13 +347,16 @@ System.out.println("Reading the path failed");
     m_iWaitLoop.setValue(m_iWaitCount);
 
   }
+
   public void initGetCommand() {
     m_stepIndex = -1;
 
   }
+
   public Command getWaitCommand(double seconds) {
     return Commands.waitSeconds(seconds);
   }
+
   public Command getNextCommand() {
     m_currentStepName = null;
     m_currentCommand = null;
@@ -377,6 +387,7 @@ System.out.println("Reading the path failed");
     }
     return m_currentCommand;
   }
+
   private AutonomousSteps getNextActiveCommand(String completionAction) {
 
     // System.out.println("getNextActiveCommand");
@@ -409,11 +420,12 @@ System.out.println("Reading the path failed");
 
     return stepName;
   }
-  
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
   }
+
   public boolean isCommandDone() {
     return m_bIsCommandDone;
   }

@@ -14,16 +14,20 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Commands.AutoControl;
+import frc.robot.Commands.AutoSelect;
 //import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Commands.DeployIntake;
 import frc.robot.Commands.NoteIntake;
 import frc.robot.Commands.RetractIntake;
 import frc.robot.Commands.ShootNote;
 import frc.robot.Commands.WaitForCount;
+import frc.robot.Libraries.ConsoleAuto;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.Autonomous;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -44,129 +48,108 @@ import java.util.List;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    // The robot's subsystems
-    private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    private final Shooter m_Shooter = new Shooter();
-    private final Intake m_Intake = new Intake();
-    // The driver's controller
-    CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+        // The robot's subsystems
+        private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+        private final Shooter m_Shooter = new Shooter();
+        private final Intake m_Intake = new Intake();
+        // The driver's controller
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        // Configure the button bindings
-        configureButtonBindings();
-        // m_Shooter.setDefaultCommand(Commands.run(
-        // () ->
-        // m_Shooter.Shoot(MathUtil.applyDeadband(m_driverController.getLeftTriggerAxis(),
-        // .5) * .5 + .5),
-        // m_Shooter));
-        // Configure default commands
-        m_robotDrive.setDefaultCommand(
-                // The left stick controls translation of the robot.
-                // Turning is controlled by the X axis of the right stick.
-                new RunCommand(
-                        () -> m_robotDrive.drive(
-                                // Multiply by max speed to map the joystick unitless inputs to actual units.
-                                // This will map the [-1, 1] to [max speed backwards, max speed forwards],
-                                // converting them to actual units.
-                                .5 * -MathUtil.applyDeadband(-m_driverController.getLeftY(), .08),
-                                .5 * MathUtil.applyDeadband(m_driverController.getLeftX(), .08),
-                                .5 * -MathUtil.applyDeadband(m_driverController.getRightX(), .08),
+        CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+        private final ConsoleAuto m_consoleAuto = new ConsoleAuto(OIConstants.kAUTONOMOUS_CONSOLE_PORT);
+        private final Autonomous m_autonomous = new Autonomous(m_consoleAuto, m_robotDrive);
+        
+        private final AutoSelect m_autoSelect = new AutoSelect(m_autonomous);
+        private final AutoControl m_autoCommand = new AutoControl(m_autonomous, m_robotDrive);
 
-                                false, false),
-                        m_robotDrive));
-    }
+        /**
+         * The container for the robot. Contains subsystems, OI devices, and commands.
+         */
+        public RobotContainer() {
+                // Configure the button bindings
+                configureButtonBindings();
+                // m_Shooter.setDefaultCommand(Commands.run(
+                // () ->
+                // m_Shooter.Shoot(MathUtil.applyDeadband(m_driverController.getLeftTriggerAxis(),
+                // .5) * .5 + .5),
+                // m_Shooter));
+                // Configure default commands
+                m_robotDrive.setDefaultCommand(
+                                // The left stick controls translation of the robot.
+                                // Turning is controlled by the X axis of the right stick.
+                                new RunCommand(
+                                                () -> m_robotDrive.drive(
+                                                                // Multiply by max speed to map the joystick unitless
+                                                                // inputs to actual units.
+                                                                // This will map the [-1, 1] to [max speed backwards,
+                                                                // max speed forwards],
+                                                                // converting them to actual units.
+                                                                .5 * -MathUtil.applyDeadband(
+                                                                                -m_driverController.getLeftY(), .08),
+                                                                .5 * MathUtil.applyDeadband(
+                                                                                m_driverController.getLeftX(), .08),
+                                                                .5 * -MathUtil.applyDeadband(
+                                                                                m_driverController.getRightX(), .08),
 
-    /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by
-     * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
-     * subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
-     * passing it to a
-     * {@link JoystickButton}.
-     */
-    private void configureButtonBindings() {
+                                                                false, false),
+                                                m_robotDrive));
+        }
 
-        m_driverController
-                .leftBumper()
-                .whileTrue(new DeployIntake(m_Intake)
-                        .andThen(new NoteIntake(m_Intake)
-                                .unless(() -> m_Intake.isNoteIn()))
-                        .andThen(new RetractIntake(m_Intake)));
-        // should deploy then run intake until a note is in it and then stops pulling
-        // note and retracts intake.
-        // but might retract intake anyway if the bumper is no longer being held.
+        /**
+         * Use this method to define your button->command mappings. Buttons can be
+         * created by
+         * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
+         * subclasses ({@link
+         * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
+         * passing it to a
+         * {@link JoystickButton}.
+         */
+        private void configureButtonBindings() {
 
-        m_driverController
-                .a()
-                .whileTrue(new RetractIntake(m_Intake));
-        // make command to deploy intake and spit note out of intake
+                m_driverController
+                                .leftBumper()
+                                .whileTrue(new DeployIntake(m_Intake)
+                                                .andThen(new NoteIntake(m_Intake)
+                                                                .unless(() -> m_Intake.isNoteIn()))
+                                                .andThen(new RetractIntake(m_Intake)));
+                // should deploy then run intake until a note is in it and then stops pulling
+                // note and retracts intake.
+                // but might retract intake anyway if the bumper is no longer being held.
 
-        m_driverController
-                .leftTrigger(.75)
-                .whileTrue(new RetractIntake(m_Intake).andThen(new ShootNote(m_Shooter, m_Intake)));
-        // Retracts Intake, starts shooter motors, waits N seconds (currently 1), has
-        // intake spit note into shooter, then waits .25 seconds to let note leave.
+                m_driverController
+                                .a()
+                                .whileTrue(new RetractIntake(m_Intake));
+                // make command to deploy intake and spit note out of intake
 
-        m_driverController
-                .b()
-                .whileTrue(Commands.run(() -> m_Intake.dropNote()));
-        m_driverController
-                .b()
-                .onFalse(Commands.run(() -> m_Intake.holdNote()));
+                m_driverController
+                                .leftTrigger(.75)
+                                .whileTrue(new RetractIntake(m_Intake).andThen(new ShootNote(m_Shooter, m_Intake)));
+                // Retracts Intake, starts shooter motors, waits N seconds (currently 1), has
+                // intake spit note into shooter, then waits .25 seconds to let note leave.
 
-        m_driverController
-        .x()
-        .whileTrue(Commands.run(() -> m_robotDrive.setX()));
-    }
+                m_driverController
+                                .b()
+                                .whileTrue(Commands.run(() -> m_Intake.dropNote()));
+                m_driverController
+                                .b()
+                                .onFalse(Commands.run(() -> m_Intake.holdNote()));
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        // Create config for trajectory
-        TrajectoryConfig config = new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-                // Add kinematics to ensure max speed is actually obeyed
-                .setKinematics(DriveConstants.kDriveKinematics);
+                m_driverController
+                                .x()
+                                .whileTrue(Commands.run(() -> m_robotDrive.setX()));
+        }
 
-        // An example trajectory to follow. All units in meters.
-        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-                // Start at the origin facing the +X direction
-                new Pose2d(0, 0, new Rotation2d(0)),
-                // Pass through these two interior waypoints, making an 's' curve path
-                List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-                // End 3 meters straight ahead of where we started, facing forward
-                new Pose2d(3, 0, new Rotation2d(0)),
-                config);
+        /**
+         * Use this to pass the autonomous command to the main {@link Robot} class.
+         *
+         * @return the command to run in autonomous
+         */
+        public Command getAutoSelect() {
+                return m_autoSelect;
+        }
 
-        var thetaController = new ProfiledPIDController(
-                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-                exampleTrajectory,
-                m_robotDrive::getPose, // Functional interface to feed supplier
-                DriveConstants.kDriveKinematics,
-
-                // Position controllers
-                new PIDController(AutoConstants.kPXController, 0, 0),
-                new PIDController(AutoConstants.kPYController, 0, 0),
-                thetaController,
-                m_robotDrive::setModuleStates,
-                m_robotDrive);
-
-        // Reset odometry to the initial pose of the trajectory, run path following
-        // command, then stop at the end.
-        return Commands.sequence(
-                new InstantCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
-                swerveControllerCommand,
-                new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
-    }
+        public Command getAutonomousCommand() {
+                // An example command will be run in autonomous
+                // Command autoCommand = ;
+                return m_autoCommand;
+        }
 }
