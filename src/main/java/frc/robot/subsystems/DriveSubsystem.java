@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
@@ -23,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
+  
+  private double m_dSpeedMutiplyer = .8;
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       CANIDConstants.kFrontLeftDrivingCanId,
       CANIDConstants.kFrontLeftTurningCanId,
@@ -70,8 +73,17 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    m_trajectoryConfig = new TrajectoryConfig(
+      DriveConstants.kMAX_SPEED_METERS_PER_SECOND,
+      DriveConstants.kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED)
+      .setKinematics(DriveConstants.kDriveKinematics);
   }
-
+public void setSpeedHigh(){
+  m_dSpeedMutiplyer = 1;
+}
+public void setSpeedLow(){
+  m_dSpeedMutiplyer = .7;
+}
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
@@ -129,7 +141,7 @@ public class DriveSubsystem extends SubsystemBase {
     if (rateLimit) {
       // Convert XY to polar for rate limiting
       double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
-      double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
+      double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2))*m_dSpeedMutiplyer;
 
       // Calculate the direction slew rate based on an estimate of the lateral acceleration
       double directionSlewRate;

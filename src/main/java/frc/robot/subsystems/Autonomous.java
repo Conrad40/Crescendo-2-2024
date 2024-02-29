@@ -244,7 +244,9 @@ public class Autonomous extends SubsystemBase {
 
   private Command m_turnPath;
   private StepState m_stepturnPath;
-  private String m_path1JSON = "paths/Path1.wpilib.json";
+  //private String m_path1JSON = "output/Blue center.wpilib.json";
+ // private String m_pathb2JSON = "output/blue drive out.wpilib.json";
+  //private String m_pathB1JSON = "output/Red"
   private Trajectory m_trajPath1;
 
   private AutonomousSteps m_currentStepName;
@@ -269,13 +271,13 @@ public class Autonomous extends SubsystemBase {
     var thetaController = new ProfiledPIDController(2, 0, 0, new Constraints(5, 1));
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    m_drivePath = new SwerveDriveController(readPaths(m_path1JSON),
+    m_drivePath = new SwerveDriveController(genTrajectory(Paths.BASIC),
         kRESET_ODOMETRY, m_drive, thetaController);
     m_autoCommand.addOption(AutonomousSteps.DRIVE, m_drivePath);
     m_stepDrivePath = new StepState(AutonomousSteps.DRIVE,
         m_ConsoleAuto.getSwitchSupplier(3));
 
-    m_testReadFilePath = new SwerveDriveController(readPaths(m_path1JSON), kRESET_ODOMETRY, drive, thetaController);
+    m_testReadFilePath = new SwerveDriveController(genTrajectory(Paths.BASIC), kRESET_ODOMETRY, drive, thetaController);
     m_autoCommand.addOption(AutonomousSteps.TEST, m_testReadFilePath);
     m_stepTestReadFile = new StepState(AutonomousSteps.TEST);
 
@@ -319,9 +321,9 @@ public class Autonomous extends SubsystemBase {
       m_iPatternSelect = 0;
     }
 
-    boolean isAllianceRed = (DriverStation.getAlliance().get() == DriverStation.Alliance.Red);
-    m_allianceColor.setBoolean(isAllianceRed);
-
+   // boolean isAllianceRed = (DriverStation.getAlliance().get() == DriverStation.Alliance.Red);
+    //m_allianceColor.setBoolean(isAllianceRed);
+ m_allianceColor.setBoolean(true);
     m_selectedCommand = m_autoSelectCommand[autoSelectIx];
     m_strCommand = m_selectedCommand.toString();
     m_autoCmd.setString(m_strCommand);

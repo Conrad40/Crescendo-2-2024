@@ -83,11 +83,11 @@ public class RobotContainer {
                                                                 // This will map the [-1, 1] to [max speed backwards,
                                                                 // max speed forwards],
                                                                 // converting them to actual units.
-                                                                .5 * -MathUtil.applyDeadband(
+                                                                 -MathUtil.applyDeadband(
                                                                                 -m_driverController.getLeftY(), .08),
-                                                                .5 * MathUtil.applyDeadband(
+                                                                 MathUtil.applyDeadband(
                                                                                 m_driverController.getLeftX(), .08),
-                                                                .5 * -MathUtil.applyDeadband(
+                                                                 -MathUtil.applyDeadband(
                                                                                 m_driverController.getRightX(), .08),
 
                                                                 false, false),
@@ -136,6 +136,9 @@ public class RobotContainer {
                 m_driverController
                                 .x()
                                 .whileTrue(Commands.run(() -> m_robotDrive.setX()));
+
+                m_driverController.rightBumper().onTrue(Commands.run(() -> m_robotDrive.setSpeedHigh()));
+                                m_driverController.rightBumper().onFalse(Commands.run(() -> m_robotDrive.setSpeedLow()));
         }
 
         /**
