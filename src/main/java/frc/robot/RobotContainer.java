@@ -151,8 +151,43 @@ public class RobotContainer {
         }
 
         public Command getAutonomousCommand() {
-                // An example command will be run in autonomous
-                // Command autoCommand = ;
-                return m_autoCommand;
+  TrajectoryConfig config = new TrajectoryConfig(
+                AutoConstants.kMaxSpeedMetersPerSecond,
+                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+                // Add kinematics to ensure max speed is actually obeyed
+                .setKinematics(DriveConstants.kDriveKinematics);
+
+        // An example trajectory to follow. All units in meters.
+        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+                // Start at the origin facing the +X direction
+                new Pose2d(0, 0, new Rotation2d(0)),
+                // Pass through these two interior waypoints, making an 's' curve path
+                List.of(new Translation2d(.5, 0), new Translation2d(1, 0)),
+                // End 3 meters straight ahead of where we started, facing forward
+                new Pose2d(1.5, 0, new Rotation2d(0)),
+                config);
+
+        var thetaController = new ProfiledPIDController(
+                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+                exampleTrajectory,
+                m_robotDrive::getPose, // Functional interface to feed supplier
+                DriveConstants.kDriveKinematics,
+
+                // Position controllers
+                new PIDController(AutoConstants.kPXController, 0, 0),
+                new PIDController(AutoConstants.kPYController, 0, 0),
+                thetaController,
+                m_robotDrive::setModuleStates,
+                m_robotDrive);
+
+        // Reset odometry to the initial pose of the trajectory, run path following
+        // command, then stop at the end.
+        return Commands.sequence(
+                new InstantCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
+                swerveControllerCommand,
+                new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
         }
 }
