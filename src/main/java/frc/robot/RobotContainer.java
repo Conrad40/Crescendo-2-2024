@@ -123,9 +123,10 @@ public class RobotContainer {
                 m_driverController
                                 .leftTrigger(.75)
                                 .whileTrue(new RetractIntake(m_Intake).andThen(new ShootNote(m_Shooter, m_Intake)));
+                                m_driverController.y().onFalse(Commands.runOnce(()->m_Intake.holdNote()));
                 // Retracts Intake, starts shooter motors, waits N seconds (currently 1), has
                 // intake spit note into shooter, then waits .25 seconds to let note leave.
-
+m_driverController.y().whileTrue(Commands.parallel(Commands.run(()->m_Intake.intakeNote()), Commands.run(()->m_Shooter.Shoot(-.3))));
                 m_driverController
                                 .b()
                                 .whileTrue(Commands.run(() -> m_Intake.dropNote()));
@@ -185,6 +186,9 @@ public class RobotContainer {
 
         // Reset odometry to the initial pose of the trajectory, run path following
         // command, then stop at the end.
+        if (m_consoleAuto.getButton(2)){
+                return new ShootNote(m_Shooter, m_Intake);
+        }
         return Commands.sequence(
                 new InstantCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
                 swerveControllerCommand,
