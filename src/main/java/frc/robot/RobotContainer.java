@@ -123,10 +123,12 @@ public class RobotContainer {
                 m_driverController
                                 .leftTrigger(.75)
                                 .whileTrue(new RetractIntake(m_Intake).andThen(new ShootNote(m_Shooter, m_Intake)));
-                                m_driverController.y().onFalse(Commands.runOnce(()->m_Intake.holdNote()));
+                                m_driverController.y().onFalse(Commands.runOnce(()->m_Intake.holdNote()).andThen(Commands.runOnce(()-> m_Shooter.Stop())));
                 // Retracts Intake, starts shooter motors, waits N seconds (currently 1), has
                 // intake spit note into shooter, then waits .25 seconds to let note leave.
-m_driverController.y().whileTrue(Commands.parallel(Commands.run(()->m_Intake.intakeNote()), Commands.run(()->m_Shooter.Shoot(-.3))));
+                m_driverController
+                                .y()
+                                .whileTrue(Commands.parallel(Commands.run(()->m_Intake.intakeNote()), Commands.run(()->m_Shooter.Shoot(-.3))));
                 m_driverController
                                 .b()
                                 .whileTrue(Commands.run(() -> m_Intake.dropNote()));
