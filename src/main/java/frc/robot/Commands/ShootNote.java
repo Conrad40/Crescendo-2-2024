@@ -7,6 +7,7 @@ package frc.robot.Commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Libraries.ConsoleTele;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
@@ -17,7 +18,7 @@ public class ShootNote extends Command {
   private Shooter m_shooter;
   private Intake m_Intake;
 private Timer m_timer = new Timer();
-
+private ConsoleTele m_Tele = new ConsoleTele(2);
   public ShootNote(Shooter shooter, Intake intake) {
 m_shooter = shooter;
 m_Intake = intake;
@@ -30,13 +31,13 @@ m_Intake = intake;
   public void initialize() {
     m_timer.reset();
     m_timer.start();
-    m_shooter.Shoot(ShooterConstants.kSHOOT_SPEED);
+    m_shooter.Shoot(m_Tele.getPo(0));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.Shoot(ShooterConstants.kSHOOT_SPEED);
+    m_shooter.Shoot(m_Tele.getPo(0));
     if(m_timer.hasElapsed(ShooterConstants.kSPIN_UP_TIME)){
 m_Intake.dropNote();
     }

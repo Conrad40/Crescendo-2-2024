@@ -50,6 +50,13 @@ public final class Constants {
 }
 
   public static final class DriveConstants {
+    public static final double kMAX_SPEED_METERS_PER_SECOND = 4.8;
+    public static final double kMAX_ANGULAR_SPEED = 2 * Math.PI; // radians per second
+    public static final double kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4;
+    public static final double kDIRECTION_SLEW_RATE = 1.2; // radians per second
+    public static final double kMAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
+    public static final double KROTATIONAL_SLEW_RATE = 2.0; // percent per second (1 = 100%)
+
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 4.8;
@@ -148,11 +155,12 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kAUTONOMOUS_CONSOLE_PORT = 1;
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAccelerationMetersPerSecondSquared = .5;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
