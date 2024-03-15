@@ -57,7 +57,7 @@ public class RobotContainer {
         CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
         private final ConsoleAuto m_consoleAuto = new ConsoleAuto(OIConstants.kAUTONOMOUS_CONSOLE_PORT);
         private final Autonomous m_autonomous = new Autonomous(m_consoleAuto, m_robotDrive);
-        
+
         private final AutoSelect m_autoSelect = new AutoSelect(m_autonomous);
         private final AutoControl m_autoCommand = new AutoControl(m_autonomous, m_robotDrive);
 
@@ -83,11 +83,11 @@ public class RobotContainer {
                                                                 // This will map the [-1, 1] to [max speed backwards,
                                                                 // max speed forwards],
                                                                 // converting them to actual units.
-                                                                 -MathUtil.applyDeadband(
+                                                                -MathUtil.applyDeadband(
                                                                                 -m_driverController.getLeftY(), .08),
-                                                                 MathUtil.applyDeadband(
+                                                                MathUtil.applyDeadband(
                                                                                 m_driverController.getLeftX(), .08),
-                                                                 -MathUtil.applyDeadband(
+                                                                -MathUtil.applyDeadband(
                                                                                 m_driverController.getRightX(), .08),
 
                                                                 false, false),
@@ -107,7 +107,7 @@ public class RobotContainer {
 
                 m_driverController
                                 .leftBumper()
-                                .whileTrue(new DeployIntake(m_Intake)
+                                .whileTrue(new DeployIntake(m_Intake).unless(() -> m_Intake.isNoteIn())
                                                 .andThen(new NoteIntake(m_Intake)
                                                                 .unless(() -> m_Intake.isNoteIn()))
                                                 .andThen(new RetractIntake(m_Intake)));
@@ -123,12 +123,14 @@ public class RobotContainer {
                 m_driverController
                                 .leftTrigger(.75)
                                 .whileTrue(new RetractIntake(m_Intake).andThen(new ShootNote(m_Shooter, m_Intake)));
-                                m_driverController.y().onFalse(Commands.runOnce(()->m_Intake.holdNote()).andThen(Commands.runOnce(()-> m_Shooter.Stop())));
+                m_driverController.y().onFalse(Commands.runOnce(() -> m_Intake.holdNote())
+                                .andThen(Commands.runOnce(() -> m_Shooter.Stop())));
                 // Retracts Intake, starts shooter motors, waits N seconds (currently 1), has
                 // intake spit note into shooter, then waits .25 seconds to let note leave.
                 m_driverController
                                 .y()
-                                .whileTrue(Commands.parallel(Commands.run(()->m_Intake.intakeNote()), Commands.run(()->m_Shooter.Shoot(-.3))));
+                                .whileTrue(Commands.parallel(Commands.run(() -> m_Intake.intakeNote()),
+                                                Commands.run(() -> m_Shooter.Shoot(-.3))));
                 m_driverController
                                 .b()
                                 .whileTrue(Commands.run(() -> m_Intake.dropNote()));
@@ -141,7 +143,7 @@ public class RobotContainer {
                                 .whileTrue(Commands.run(() -> m_robotDrive.setX()));
 
                 m_driverController.rightBumper().onTrue(Commands.run(() -> m_robotDrive.setSpeedHigh()));
-                                m_driverController.rightBumper().onFalse(Commands.run(() -> m_robotDrive.setSpeedLow()));
+                m_driverController.rightBumper().onFalse(Commands.run(() -> m_robotDrive.setSpeedLow()));
         }
 
         /**
@@ -154,46 +156,47 @@ public class RobotContainer {
         }
 
         public Command getAutonomousCommand() {
-  TrajectoryConfig config = new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-                // Add kinematics to ensure max speed is actually obeyed
-                .setKinematics(DriveConstants.kDriveKinematics);
+                TrajectoryConfig config = new TrajectoryConfig(
+                                AutoConstants.kMaxSpeedMetersPerSecond,
+                                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+                                // Add kinematics to ensure max speed is actually obeyed
+                                .setKinematics(DriveConstants.kDriveKinematics);
 
-        // An example trajectory to follow. All units in meters.
-        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-                // Start at the origin facing the +X direction
-                new Pose2d(0, 0, new Rotation2d(0)),
-                // Pass through these two interior waypoints, making an 's' curve path
-                List.of(new Translation2d(.5, 0), new Translation2d(1, 0)),
-                // End 3 meters straight ahead of where we started, facing forward
-                new Pose2d(1.5, 0, new Rotation2d(0)),
-                config);
+                // An example trajectory to follow. All units in meters.
+                Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+                                // Start at the origin facing the +X direction
+                                new Pose2d(0, 0, new Rotation2d(Math.PI)),
+                                // Pass through these two interior waypoints, making an 's' curve path
+                                List.of(new Translation2d(.5, 0), new Translation2d(1, 0)),
+                                // End 3 meters straight ahead of where we started, facing forward
+                                new Pose2d(1.5, 0, new Rotation2d(0)),
+                                config);
 
-        var thetaController = new ProfiledPIDController(
-                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+                var thetaController = new ProfiledPIDController(
+                                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+                thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-                exampleTrajectory,
-                m_robotDrive::getPose, // Functional interface to feed supplier
-                DriveConstants.kDriveKinematics,
+                SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+                                exampleTrajectory,
+                                m_robotDrive::getPose, // Functional interface to feed supplier
+                                DriveConstants.kDriveKinematics,
 
-                // Position controllers
-                new PIDController(AutoConstants.kPXController, 0, 0),
-                new PIDController(AutoConstants.kPYController, 0, 0),
-                thetaController,
-                m_robotDrive::setModuleStates,
-                m_robotDrive);
+                                // Position controllers
+                                new PIDController(AutoConstants.kPXController, 0, 0),
+                                new PIDController(AutoConstants.kPYController, 0, 0),
+                                thetaController,
+                                m_robotDrive::setModuleStates,
+                                m_robotDrive);
 
-        // Reset odometry to the initial pose of the trajectory, run path following
-        // command, then stop at the end.
-        if (m_consoleAuto.getButton(2)){
-                return new ShootNote(m_Shooter, m_Intake);
-        }
-        return Commands.sequence(
-                new InstantCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
-                swerveControllerCommand,
-                new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
+                // Reset odometry to the initial pose of the trajectory, run path following
+                // command, then stop at the end.
+                if (m_consoleAuto.getButton(2)) {
+                        return new ShootNote(m_Shooter, m_Intake);
+                }
+                return Commands.sequence(
+                                new InstantCommand(
+                                                () -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
+                                swerveControllerCommand,
+                                new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
         }
 }
