@@ -76,7 +76,7 @@ public class RobotContainer {
                 // m_Shooter));
                 // Configure default commands
 
-                m_Climber.setDefaultCommand(new RunCommand(() -> m_Climber.Stop()));
+                m_Climber.setDefaultCommand(new RunCommand(() -> m_Climber.Stop(),m_Climber));
 
                 m_robotDrive.setDefaultCommand(
                                 // The left stick controls translation of the robot.
@@ -109,8 +109,8 @@ public class RobotContainer {
          * {@link JoystickButton}.
          */
         private void configureButtonBindings() {
-                m_driverController.povUp().whileTrue(Commands.run(() -> m_Climber.Climb(.9473)));
-                m_driverController.povDown().whileTrue(Commands.run(() -> m_Climber.Climb(-.9473)));
+                m_driverController.povUp().whileTrue(Commands.run(() -> m_Climber.Climb(1.0)));
+                m_driverController.povDown().whileTrue(Commands.run(() -> m_Climber.Climb(-1.0)));
 
                 m_driverController
                                 .leftBumper()
@@ -203,7 +203,7 @@ public class RobotContainer {
                 return Commands.sequence(
                                 new InstantCommand(
                                                 () -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
-                                swerveControllerCommand,
-                                new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
+                                swerveControllerCommand);
+                                //new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
         }
 }
