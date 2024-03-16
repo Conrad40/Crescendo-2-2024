@@ -28,6 +28,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Autonomous;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -52,6 +53,7 @@ public class RobotContainer {
         private final DriveSubsystem m_robotDrive = new DriveSubsystem();
         private final Shooter m_Shooter = new Shooter();
         private final Intake m_Intake = new Intake();
+        private final Climber m_Climber = new Climber();
         // The driver's controller
 
         CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -73,6 +75,9 @@ public class RobotContainer {
                 // .5) * .5 + .5),
                 // m_Shooter));
                 // Configure default commands
+
+                m_Climber.setDefaultCommand(new RunCommand(() -> m_Climber.Stop()));
+
                 m_robotDrive.setDefaultCommand(
                                 // The left stick controls translation of the robot.
                                 // Turning is controlled by the X axis of the right stick.
@@ -104,6 +109,8 @@ public class RobotContainer {
          * {@link JoystickButton}.
          */
         private void configureButtonBindings() {
+                m_driverController.povUp().whileTrue(Commands.run(() -> m_Climber.Climb(.9473)));
+                m_driverController.povDown().whileTrue(Commands.run(() -> m_Climber.Climb(-.9473)));
 
                 m_driverController
                                 .leftBumper()

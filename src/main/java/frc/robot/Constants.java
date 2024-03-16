@@ -46,6 +46,9 @@ public final class Constants {
 
     public static final int kINTAKE_LIFT_MOTOR_ID = 20;
     public static final int kINTAKE_SPIN_MOTOR_ID = 21;
+    
+    public static final int kCLIMBER_LEFT_MOTOR_ID = 30;
+    public static final int kCLIMBER_RIGHT_MOTOR_ID = 31;
 
 }
 
@@ -152,7 +155,10 @@ public final class Constants {
     public static final double kSHOOT_SPEED = .8;
     public static final double kSPIN_UP_TIME = 1.0;
     }
-
+public static final class ClimbConstants {
+public static final boolean kIS_INVERTED = false;
+  
+}
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kAUTONOMOUS_CONSOLE_PORT = 1;
