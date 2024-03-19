@@ -78,12 +78,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED)
       .setKinematics(DriveConstants.kDriveKinematics);
   }
-public void setSpeedHigh(){
-  m_dSpeedMutiplyer = 1;
-}
-public void setSpeedLow(){
-  m_dSpeedMutiplyer = .7;
-}
+
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
@@ -133,8 +128,12 @@ public void setSpeedLow(){
    *                      field.
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
-    
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit, boolean isHighSpeed) {
+    if (isHighSpeed){
+      m_dSpeedMutiplyer= 1;
+    }else{
+      m_dSpeedMutiplyer = .5;
+    }
     double xSpeedCommanded;
     double ySpeedCommanded;
 
@@ -181,8 +180,8 @@ public void setSpeedLow(){
 
 
     } else {
-      xSpeedCommanded = xSpeed;
-      ySpeedCommanded = ySpeed;
+      xSpeedCommanded = xSpeed * m_dSpeedMutiplyer;
+      ySpeedCommanded = ySpeed * m_dSpeedMutiplyer;
       m_currentRotation = rot;
     }
 

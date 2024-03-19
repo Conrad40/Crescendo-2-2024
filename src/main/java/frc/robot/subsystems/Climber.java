@@ -5,10 +5,13 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANIDConstants;
 import frc.robot.Constants.ClimbConstants;
@@ -22,7 +25,8 @@ public class Climber extends SubsystemBase {
   private SparkLimitSwitch m_leftReverseLimit;
   private SparkLimitSwitch m_rightForwardLimit;
   private SparkLimitSwitch m_rightReverseLimit;
-
+private RelativeEncoder m_Encoder;
+private RelativeEncoder m_REncoder;
   public Climber() {
     m_left = new CANSparkMax(CANIDConstants.kCLIMBER_LEFT_MOTOR_ID, MotorType.kBrushless);
     m_right = new CANSparkMax(CANIDConstants.kCLIMBER_RIGHT_MOTOR_ID, MotorType.kBrushless);
@@ -37,11 +41,22 @@ public class Climber extends SubsystemBase {
     m_leftReverseLimit = m_left.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
     m_rightForwardLimit = m_right.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
     m_rightReverseLimit = m_right.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
-
+m_Encoder = m_left.getEncoder();
+m_REncoder = m_right.getEncoder();
+m_REncoder.setPosition(0);
+m_Encoder.setPosition(0);
   }
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("climb encoder", m_Encoder.getPosition());
+    if (m_leftForwardLimit.isPressed()){
+      m_Encoder.setPosition(0);
+     
+    }
+    if (m_rightForwardLimit.isPressed()){
+       m_REncoder.setPosition(0);
+    }
     // This method will be called once per scheduler run
   }
 

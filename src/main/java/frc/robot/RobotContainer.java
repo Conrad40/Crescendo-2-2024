@@ -95,7 +95,7 @@ public class RobotContainer {
                                                                 -MathUtil.applyDeadband(
                                                                                 m_driverController.getRightX(), .08),
 
-                                                                false, false),
+                                                                false, false, !m_Intake.isOut()),
                                                 m_robotDrive));
         }
 
@@ -149,8 +149,6 @@ public class RobotContainer {
                                 .x()
                                 .whileTrue(Commands.run(() -> m_robotDrive.setX()));
 
-                m_driverController.rightBumper().onTrue(Commands.run(() -> m_robotDrive.setSpeedHigh()));
-                m_driverController.rightBumper().onFalse(Commands.run(() -> m_robotDrive.setSpeedLow()));
         }
 
         /**
@@ -172,9 +170,9 @@ public class RobotContainer {
                 // An example trajectory to follow. All units in meters.
                 Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
                                 // Start at the origin facing the +X direction
-                                new Pose2d(0, 0, new Rotation2d(Math.PI)),
+                                new Pose2d(0, 0,new Rotation2d(0)),
                                 // Pass through these two interior waypoints, making an 's' curve path
-                                List.of(new Translation2d(.5, 0), new Translation2d(1, 0)),
+                                List.of( new Translation2d(1, new Rotation2d(0))),
                                 // End 3 meters straight ahead of where we started, facing forward
                                 new Pose2d(1.5, 0, new Rotation2d(0)),
                                 config);

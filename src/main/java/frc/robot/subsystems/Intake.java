@@ -73,7 +73,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void retractIntake() {
-    m_liftMotor.set(-.8);
+    m_liftMotor.set(-.6);
   }
 
 //IsOut and isIn might be sending the wrong limitswitch, testing should be done.
