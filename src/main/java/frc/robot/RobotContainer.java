@@ -28,6 +28,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Autonomous;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -52,6 +53,7 @@ public class RobotContainer {
         private final DriveSubsystem m_robotDrive = new DriveSubsystem();
         private final Shooter m_Shooter = new Shooter();
         private final Intake m_Intake = new Intake();
+        private final Climber m_Climber = new Climber();
         // The driver's controller
 
         CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -73,6 +75,9 @@ public class RobotContainer {
                 // .5) * .5 + .5),
                 // m_Shooter));
                 // Configure default commands
+
+                m_Climber.setDefaultCommand(new RunCommand(() -> m_Climber.Stop(),m_Climber));
+
                 m_robotDrive.setDefaultCommand(
                                 // The left stick controls translation of the robot.
                                 // Turning is controlled by the X axis of the right stick.
@@ -90,7 +95,7 @@ public class RobotContainer {
                                                                 -MathUtil.applyDeadband(
                                                                                 m_driverController.getRightX(), .08),
 
-                                                                false, false),
+                                                                false, false, !m_Intake.isOut()),
                                                 m_robotDrive));
         }
 
@@ -104,6 +109,8 @@ public class RobotContainer {
          * {@link JoystickButton}.
          */
         private void configureButtonBindings() {
+                m_driverController.povUp().whileTrue(Commands.run(() -> m_Climber.Climb(1.0)));
+                m_driverController.povDown().whileTrue(Commands.run(() -> m_Climber.Climb(-1.0)));
 
                 m_driverController
                                 .leftBumper()
@@ -142,8 +149,6 @@ public class RobotContainer {
                                 .x()
                                 .whileTrue(Commands.run(() -> m_robotDrive.setX()));
 
-                m_driverController.rightBumper().onTrue(Commands.run(() -> m_robotDrive.setSpeedHigh()));
-                m_driverController.rightBumper().onFalse(Commands.run(() -> m_robotDrive.setSpeedLow()));
         }
 
         /**
@@ -165,9 +170,9 @@ public class RobotContainer {
                 // An example trajectory to follow. All units in meters.
                 Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
                                 // Start at the origin facing the +X direction
-                                new Pose2d(0, 0, new Rotation2d(Math.PI)),
+                                new Pose2d(0, 0,new Rotation2d(0)),
                                 // Pass through these two interior waypoints, making an 's' curve path
-                                List.of(new Translation2d(.5, 0), new Translation2d(1, 0)),
+                                List.of( new Translation2d(1, new Rotation2d(0))),
                                 // End 3 meters straight ahead of where we started, facing forward
                                 new Pose2d(1.5, 0, new Rotation2d(0)),
                                 config);
@@ -196,7 +201,7 @@ public class RobotContainer {
                 return Commands.sequence(
                                 new InstantCommand(
                                                 () -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
-                                swerveControllerCommand,
-                                new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
+                                swerveControllerCommand);
+                                //new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
         }
 }

@@ -46,6 +46,9 @@ public final class Constants {
 
     public static final int kINTAKE_LIFT_MOTOR_ID = 20;
     public static final int kINTAKE_SPIN_MOTOR_ID = 21;
+    
+    public static final int kCLIMBER_LEFT_MOTOR_ID = 30;
+    public static final int kCLIMBER_RIGHT_MOTOR_ID = 31;
 
 }
 
@@ -67,9 +70,9 @@ public final class Constants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26.5);
+    public static final double kTrackWidth = Units.inchesToMeters(21.5);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(26.5);
+    public static final double kWheelBase = Units.inchesToMeters(24.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -101,7 +104,7 @@ public final class Constants {
     // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
     // This changes the drive speed of the module (a pinion gear with more teeth will result in a
     // robot that drives faster).
-    public static final int kDrivingMotorPinionTeeth = 14;
+    public static final int kDrivingMotorPinionTeeth = 12;
 
     // Invert the turning encoder, since the output shaft rotates in the opposite direction of
     // the steering motor in the MAXSwerve Module.
@@ -152,15 +155,18 @@ public final class Constants {
     public static final double kSHOOT_SPEED = .8;
     public static final double kSPIN_UP_TIME = 1.0;
     }
-
+public static final class ClimbConstants {
+public static final boolean kIS_INVERTED = false;
+  
+}
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kAUTONOMOUS_CONSOLE_PORT = 1;
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 1;
-    public static final double kMaxAccelerationMetersPerSecondSquared = .5;
+    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 2;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
