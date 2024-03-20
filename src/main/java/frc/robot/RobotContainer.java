@@ -257,13 +257,14 @@ public class RobotContainer {
                                                                                                                 .getInitialPose())),
                                                                 swerveControllerCommand)));
                         case 5:
-                                return Commands.sequence(new ShootNote(m_Shooter, m_Intake), Commands.parallel(
-                                                Commands.sequence(new DeployIntake(m_Intake)
+                                return Commands.sequence(new ShootNote(m_Shooter, m_Intake), 
+                                                Commands.parallel(
+                                                        Commands.sequence(new DeployIntake(m_Intake)
                                                                 .unless(() -> m_Intake.isNoteIn())
                                                                 .andThen(new NoteIntake(m_Intake)
                                                                                 .unless(() -> m_Intake.isNoteIn()))
                                                                 .andThen(new RetractIntake(m_Intake))),
-                                                Commands.sequence(
+                                                        Commands.sequence(
                                                                 new InstantCommand(
                                                                                 () -> m_robotDrive.resetOdometry(
                                                                                                 exampleTrajectory
@@ -272,7 +273,7 @@ public class RobotContainer {
                                                 Commands.sequence(
                                                                 new InstantCommand(
                                                                                 () -> m_robotDrive.resetOdometry(
-                                                                                                exampleTrajectory
+                                                                                                BackTrajectory
                                                                                                                 .getInitialPose())),
                                                                 swerveControllerCommandBack),
                                                 new ShootNote(m_Shooter, m_Intake));
