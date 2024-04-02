@@ -71,11 +71,14 @@ m_Encoder.setPosition(0);
   }
 
   public void Climb(Double speed) {
-    m_right.set(speed* (((m_gyro.getRoll())/20)+.75));
-    m_left.set(speed* (((-m_gyro.getRoll())/20)+.75));
+    m_right.set(speed* (((m_gyro.getRoll()-4.6)/10)+1));
+    m_left.set(speed* (((-m_gyro.getRoll()+4.6)/10)+1));
   }
 
-
+public void ArmIndependient(Double speed){
+  m_left.set(speed);
+  m_right.set(-speed);
+}
 
   public void Stop(){
 m_right.stopMotor();
