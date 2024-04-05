@@ -113,6 +113,8 @@ public class RobotContainer {
                 m_driverController.povDown().whileTrue(Commands.run(() -> m_Climber.Climb(-1.0)));
                 m_driverController.povLeft().whileTrue(Commands.run(() -> m_Climber.ArmIndependient(-1.0)));
                 m_driverController.povRight().whileTrue(Commands.run(() -> m_Climber.ArmIndependient(1.0)));
+
+                
                 m_driverController
                                 .leftBumper()
                                 .whileTrue(new DeployIntake(m_Intake).unless(() -> m_Intake.isNoteIn())
