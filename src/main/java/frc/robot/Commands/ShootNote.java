@@ -37,7 +37,7 @@ m_Intake = intake;
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.Shoot(m_Tele.getPo(0));
+    m_shooter.Shoot(.9);
     if(m_timer.hasElapsed(ShooterConstants.kSPIN_UP_TIME)){
 m_Intake.dropNote();
     }

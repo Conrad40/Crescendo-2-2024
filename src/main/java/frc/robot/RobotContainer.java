@@ -76,7 +76,7 @@ public class RobotContainer {
                 // m_Shooter));
                 // Configure default commands
 
-                m_Climber.setDefaultCommand(new RunCommand(() -> m_Climber.Stop(),m_Climber));
+                m_Climber.setDefaultCommand(new RunCommand(() -> m_Climber.Stop(), m_Climber));
 
                 m_robotDrive.setDefaultCommand(
                                 // The left stick controls translation of the robot.
@@ -111,7 +111,10 @@ public class RobotContainer {
         private void configureButtonBindings() {
                 m_driverController.povUp().whileTrue(Commands.run(() -> m_Climber.Climb(1.0)));
                 m_driverController.povDown().whileTrue(Commands.run(() -> m_Climber.Climb(-1.0)));
+                m_driverController.povLeft().whileTrue(Commands.run(() -> m_Climber.ArmIndependient(-1.0)));
+                m_driverController.povRight().whileTrue(Commands.run(() -> m_Climber.ArmIndependient(1.0)));
 
+                
                 m_driverController
                                 .leftBumper()
                                 .whileTrue(new DeployIntake(m_Intake).unless(() -> m_Intake.isNoteIn())
@@ -171,12 +174,29 @@ public class RobotContainer {
                 // An example trajectory to follow. All units in meters.
                 Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
                                 // Start at the origin facing the +X direction
-                                new Pose2d(0, 0,new Rotation2d(Math.PI)),
+                                new Pose2d(0, 0, new Rotation2d(Math.PI)),
                                 // Pass through these two interior waypoints, making an 's' curve path
-                                List.of( new Translation2d(1, new Rotation2d(0))),
+                                List.of(new Translation2d(1, new Rotation2d(0))),
                                 // End 3 meters straight ahead of where we started, facing forward
                                 new Pose2d(1.5, 0, new Rotation2d(Math.PI)),
                                 config);
+
+                TrajectoryConfig config2 = new TrajectoryConfig(
+                                AutoConstants.kMaxSpeedMetersPerSecond,
+                                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+                                .setReversed(false)
+                                .setKinematics(DriveConstants.kDriveKinematics);
+
+                // Add kinematics to ensure max speed is actually obeyed
+
+                Trajectory BackTrajectory = TrajectoryGenerator.generateTrajectory(
+                                // Start at the origin facing the +X direction
+                                new Pose2d(0, 0, new Rotation2d(0)),
+                                // Pass through these two interior waypoints, making an 's' curve path
+                                List.of(new Translation2d(1, new Rotation2d(0))),
+                                // End 3 meters straight ahead of where we started, facing forward
+                                new Pose2d(1.5, 0, new Rotation2d(0)),
+                                config2);
 
                 var thetaController = new ProfiledPIDController(
                                 AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
@@ -194,15 +214,94 @@ public class RobotContainer {
                                 m_robotDrive::setModuleStates,
                                 m_robotDrive);
 
+                SwerveControllerCommand swerveControllerCommandBack = new SwerveControllerCommand(
+                                BackTrajectory,
+                                m_robotDrive::getPose, // Functional interface to feed supplier
+                                DriveConstants.kDriveKinematics,
+
+                                // Position controllers
+                                new PIDController(AutoConstants.kPXController, 0, 0),
+                                new PIDController(AutoConstants.kPYController, 0, 0),
+                                thetaController,
+                                m_robotDrive::setModuleStates,
+                                m_robotDrive);
                 // Reset odometry to the initial pose of the trajectory, run path following
                 // command, then stop at the end.
-                if (m_consoleAuto.getButton(2)) {
-                        return new ShootNote(m_Shooter, m_Intake);
+
+                switch (m_consoleAuto.getROT_SW_0()) {
+                        case 0:
+                                return null;
+
+                        case 1:
+                                return Commands.sequence(Commands.waitSeconds(m_consoleAuto.getROT_SW_1()),
+                                                new ShootNote(m_Shooter, m_Intake));
+                        case 2:
+                                return Commands.sequence(Commands.waitSeconds(m_consoleAuto.getROT_SW_1()),
+                                                new InstantCommand(
+                                                                () -> m_robotDrive.resetOdometry(
+                                                                                exampleTrajectory.getInitialPose())),
+                                                swerveControllerCommand);
+                        case 3:
+                                return Commands.sequence(Commands.waitSeconds(m_consoleAuto.getROT_SW_1()),
+                                                new ShootNote(m_Shooter, m_Intake),
+                                                new InstantCommand(
+                                                                () -> m_robotDrive.resetOdometry(
+                                                                                exampleTrajectory.getInitialPose())),
+                                                swerveControllerCommand);
+                        case 4:
+                                return Commands.sequence(Commands.waitSeconds(m_consoleAuto.getROT_SW_1()),
+                                                new ShootNote(m_Shooter, m_Intake), Commands.parallel(
+                                                                Commands.sequence(new DeployIntake(m_Intake)
+                                                                                .unless(() -> m_Intake.isNoteIn())
+                                                                                .andThen(new NoteIntake(m_Intake)
+                                                                                                .unless(() -> m_Intake
+                                                                                                                .isNoteIn()))
+                                                                                .andThen(new RetractIntake(m_Intake))),
+                                                                Commands.sequence(
+                                                                                new InstantCommand(
+                                                                                                () -> m_robotDrive
+                                                                                                                .resetOdometry(
+                                                                                                                                exampleTrajectory
+                                                                                                                                                .getInitialPose())),
+                                                                                swerveControllerCommand)));
+                        case 5:
+                                return Commands.sequence(Commands.waitSeconds(m_consoleAuto.getROT_SW_1()),
+                                                new ShootNote(m_Shooter, m_Intake),
+                                                Commands.parallel(
+                                                                Commands.sequence(new DeployIntake(m_Intake)
+                                                                                .unless(() -> m_Intake.isNoteIn())
+                                                                                .andThen(new NoteIntake(m_Intake)
+                                                                                                .unless(() -> m_Intake
+                                                                                                                .isNoteIn()))
+                                                                                .andThen(new RetractIntake(m_Intake))),
+                                                                Commands.sequence(
+                                                                                new InstantCommand(
+                                                                                                () -> m_robotDrive
+                                                                                                                .resetOdometry(
+                                                                                                                                exampleTrajectory
+                                                                                                                                                .getInitialPose())),
+                                                                                swerveControllerCommand)),
+                                                Commands.sequence(
+                                                                new InstantCommand(
+                                                                                () -> m_robotDrive.resetOdometry(
+                                                                                                BackTrajectory
+                                                                                                                .getInitialPose())),
+                                                                swerveControllerCommandBack),
+                                                new ShootNote(m_Shooter, m_Intake));
+                        default:
+                                return null;
+
                 }
-                return Commands.sequence(
-                                new InstantCommand(
-                                                () -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
-                                swerveControllerCommand);
-                                //new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
+
+                /*
+                 * if (m_consoleAuto.getButton(2)) {
+                 * return new ShootNote(m_Shooter, m_Intake);
+                 * }
+                 * return Commands.sequence(
+                 * new InstantCommand(
+                 * () -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
+                 * swerveControllerCommand);
+                 * // new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
+                 */
         }
 }

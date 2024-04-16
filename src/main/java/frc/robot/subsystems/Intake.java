@@ -65,7 +65,7 @@ public class Intake extends SubsystemBase {
 
   // the reason for .2 is to test the limit switch before having it go fast
   public void deployIntake() {
-    m_liftMotor.set(.8);
+    m_liftMotor.set(.9);
   }
 
   public void stopIntake() {
