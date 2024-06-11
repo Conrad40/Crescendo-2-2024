@@ -54,12 +54,14 @@ public class RobotContainer {
         private final Shooter m_Shooter = new Shooter();
         private final Intake m_Intake = new Intake();
         private final Climber m_Climber = new Climber();
+       
         // The driver's controller
-
         CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+        //the weird box to the right of the laptop on the DS
         private final ConsoleAuto m_consoleAuto = new ConsoleAuto(OIConstants.kAUTONOMOUS_CONSOLE_PORT);
-        private final Autonomous m_autonomous = new Autonomous(m_consoleAuto, m_robotDrive);
 
+        private final Autonomous m_autonomous = new Autonomous(m_consoleAuto, m_robotDrive);// due to time contraits I gave up on doing auto the fancy way these three lines and the 
+        // autonomous files simply are no longer used in code. However I did not delete them due to the amout of time it would take. You can now use them as examples of what to do.
         private final AutoSelect m_autoSelect = new AutoSelect(m_autonomous);
         private final AutoControl m_autoCommand = new AutoControl(m_autonomous, m_robotDrive);
 
@@ -77,7 +79,9 @@ public class RobotContainer {
                 // Configure default commands
 
                 m_Climber.setDefaultCommand(new RunCommand(() -> m_Climber.Stop(), m_Climber));
-
+                //New programmers: please note that when using a RunCommand you have to give it a subsystem otherwise it wont work. But it will not tell you that you forgot it.
+                // the reason it doesnt require a subsystem is because the method you give it might not use a subsystem, but if it does you have to give it control of that subsystem.
+                //this could change next year.
                 m_robotDrive.setDefaultCommand(
                                 // The left stick controls translation of the robot.
                                 // Turning is controlled by the X axis of the right stick.
@@ -88,6 +92,8 @@ public class RobotContainer {
                                                                 // This will map the [-1, 1] to [max speed backwards,
                                                                 // max speed forwards],
                                                                 // converting them to actual units.
+                                                                //"MathUtil.applyDeadband" is used because when the conroller joysticks are released
+                                                                //they can still read a small non-zero number when they should be reading zero
                                                                 -MathUtil.applyDeadband(
                                                                                 -m_driverController.getLeftY(), .08),
                                                                 MathUtil.applyDeadband(
@@ -109,6 +115,8 @@ public class RobotContainer {
          * {@link JoystickButton}.
          */
         private void configureButtonBindings() {
+                //this is were you should be configuring the buttons 
+
                 m_driverController.povUp().whileTrue(Commands.run(() -> m_Climber.Climb(1.0)));
                 m_driverController.povDown().whileTrue(Commands.run(() -> m_Climber.Climb(-1.0)));
                 m_driverController.povLeft().whileTrue(Commands.run(() -> m_Climber.ArmIndependient(-1.0)));
@@ -123,7 +131,6 @@ public class RobotContainer {
                                                 .andThen(new RetractIntake(m_Intake)));
                 // should deploy then run intake until a note is in it and then stops pulling
                 // note and retracts intake.
-                // but might retract intake anyway if the bumper is no longer being held.
 
                 m_driverController
                                 .a()
@@ -160,7 +167,7 @@ public class RobotContainer {
          * @return the command to run in autonomous
          */
         public Command getAutoSelect() {
-                return m_autoSelect;
+               return m_autoSelect;
         }
 
         public Command getAutonomousCommand() {
@@ -228,6 +235,16 @@ public class RobotContainer {
                 // Reset odometry to the initial pose of the trajectory, run path following
                 // command, then stop at the end.
 
+
+                //a switch command that gets the position of the Rotery switch(0) on the auto side of the console.
+                // YOU SHOULD ALWAYS HAVE A OPTIONAL WAIT for auto if the path involes any action. Helps pevent auto collistions with other teams.
+                //0 = nothing
+                //1 = waits a few seconds based off of Rotery switch 1 auto side of the console and then shoots a note.
+                //2 = Optional wait, followed by a drive out
+                //3 = Optional wait, shoots a note, drive out.
+                //4 = Optional wait, shoots a note, drive out while intaking a note.
+                //5 = Optional wait, shoots a note, drive out while intaking a note, drives back, shoots 2nd note
+                //6+ = the Rotery switch we used only has 6 positions but if it ever reads 6 or higher the default is do nothing.
                 switch (m_consoleAuto.getROT_SW_0()) {
                         case 0:
                                 return null;
@@ -289,7 +306,8 @@ public class RobotContainer {
                                                                 swerveControllerCommandBack),
                                                 new ShootNote(m_Shooter, m_Intake));
                         default:
-                                return null;
+                                return null;//without the default being a return null, the code would crash if the dial was in a position that was not coded for. 
+                                //All switch statments should include a default behavor. Note java normaly doesn't require a default but it is best practice.
 
                 }
 

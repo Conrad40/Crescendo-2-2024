@@ -13,6 +13,7 @@ public class WaitForCount extends Command {
 
   //the old code had this, I grabed it because I mistakenly thought it would be useful for the shooting command. I am keeping it because it is also used in auto.
   //I did simplfy it from the old code.
+  // It is better to just use Commands.waitSeconds()
   private Timer m_timer = new Timer();
   double m_duration;
   public WaitForCount(double duration) {
