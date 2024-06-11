@@ -60,10 +60,10 @@ public class RobotContainer {
         //the weird box to the right of the laptop on the DS
         private final ConsoleAuto m_consoleAuto = new ConsoleAuto(OIConstants.kAUTONOMOUS_CONSOLE_PORT);
 
-        private final Autonomous m_autonomous = new Autonomous(m_consoleAuto, m_robotDrive);// due to time contraits I gave up on doing auto the fancy way these three lines and the 
+        private final Autonomous m_autonomous = new Autonomous(m_consoleAuto, m_robotDrive,m_Shooter,m_Intake);// due to time contraits I gave up on doing auto the fancy way these three lines and the 
         // autonomous files simply are no longer used in code. However I did not delete them due to the amout of time it would take. You can now use them as examples of what to do.
         private final AutoSelect m_autoSelect = new AutoSelect(m_autonomous);
-        private final AutoControl m_autoCommand = new AutoControl(m_autonomous, m_robotDrive);
+        private final AutoControl m_autoCommand = new AutoControl(m_autonomous, m_robotDrive,m_Shooter,m_Intake);
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -160,17 +160,19 @@ public class RobotContainer {
                                 .whileTrue(Commands.run(() -> m_robotDrive.setX()));
 
         }
+        public Command getAutoSelect() {
+               return m_autoSelect;
+        }
 
         /**
          * Use this to pass the autonomous command to the main {@link Robot} class.
          *
          * @return the command to run in autonomous
          */
-        public Command getAutoSelect() {
-               return m_autoSelect;
-        }
 
         public Command getAutonomousCommand() {
+                return m_autoCommand;
+                /* 
                 TrajectoryConfig config = new TrajectoryConfig(
                                 AutoConstants.kMaxSpeedMetersPerSecond,
                                 AutoConstants.kMaxAccelerationMetersPerSecondSquared)
@@ -306,10 +308,11 @@ public class RobotContainer {
                                                                 swerveControllerCommandBack),
                                                 new ShootNote(m_Shooter, m_Intake));
                         default:
-                                return null;//without the default being a return null, the code would crash if the dial was in a position that was not coded for. 
+                                return null;
+                                //without the default being a return null, the code would crash if the dial was in a position that was not coded for. 
                                 //All switch statments should include a default behavor. Note java normaly doesn't require a default but it is best practice.
 
-                }
+                }*/
 
                 /*
                  * if (m_consoleAuto.getButton(2)) {

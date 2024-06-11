@@ -6,7 +6,12 @@ package frc.robot.Libraries;
 
 /** Add your docs here. */
 public enum AutonomousCommands {
-    GENERIC_DEFAULT;
+    WAIT_SHOOT,
+    WAIT_DRIVE,
+    SHOOT_DRIVE,
+    SHOOT_INTAKE,
+    SHOOT_SHOOT;
+
 
 
     public String getSelectName() {

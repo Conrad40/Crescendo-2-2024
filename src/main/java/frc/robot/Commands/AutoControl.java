@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.Autonomous;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 
 public class AutoControl extends Command {
@@ -11,13 +13,15 @@ public class AutoControl extends Command {
     private Command m_currentCommand;
     private Autonomous m_autonomous;
     private DriveSubsystem m_drive;
+    private Shooter m_Shooter;
+    private Intake m_intake;
 
-
-    public AutoControl(Autonomous autonomous, DriveSubsystem drive) {
+    public AutoControl(Autonomous autonomous, DriveSubsystem drive,Shooter shooter,Intake intake) {
         m_autonomous = autonomous;
         m_drive = drive;
-
-        addRequirements(m_autonomous, m_drive);
+        m_intake = intake;
+        m_Shooter = shooter;
+        addRequirements(m_autonomous, m_drive, shooter, m_intake);
     }
 
     @Override
