@@ -3,6 +3,7 @@ package frc.robot.Libraries;
 import java.util.function.BooleanSupplier;
 
 public class StepState {
+    // holds the Name of a step and if it was givin a switch to control it.
     private AutonomousSteps m_name;
     private BooleanSupplier m_stepEnabled;
 

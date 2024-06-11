@@ -7,7 +7,7 @@ package frc.robot.Libraries;
 /** Add your docs here. */
 public enum AutonomousCommands {
     GENERIC_DEFAULT;
-
+// the very impressive list of different autos
 
     public String getSelectName() {
         return this.toString();
