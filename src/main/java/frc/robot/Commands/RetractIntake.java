@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
 public class RetractIntake extends Command {
-
+//Retracts the Intake
   private Intake m_intake;
 
   /** Creates a new RetractIntake. */

@@ -16,14 +16,18 @@ public class Shooter extends SubsystemBase {
 
   private TalonFX m_shooterMotorLeft;
   private TalonFX m_shooterMotorRight;
+  //the motors are called krakens but they have a Talon motor controller built in and as programmers we only care about the motor controller.
 
   public Shooter() {
+    //Setting the CAN IDs
     m_shooterMotorLeft = new TalonFX(CANIDConstants.kSHOOTER_LEFT_MOTOR_ID);
     m_shooterMotorRight = new TalonFX(CANIDConstants.kSHOOTER_RIGHT_MOTOR_ID);
 
-    m_shooterMotorLeft.setInverted(!ShooterConstants.kIS_INVERTED);
+    //set Inverted so that they go in different directions 
+    m_shooterMotorLeft.setInverted(!ShooterConstants.kIS_INVERTED);// the "!" is the not opperator in java. Turn true to false and false to true.
     m_shooterMotorRight.setInverted(ShooterConstants.kIS_INVERTED);
 
+    // set Neutral mode is the same as set Idle mode for the Sparks. the reason I set it to coast is to minimize damage to notes
     m_shooterMotorLeft.setNeutralMode(NeutralModeValue.Coast);
     m_shooterMotorRight.setNeutralMode(NeutralModeValue.Coast);
   }
@@ -31,10 +35,13 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    //by default all subsystems have this method however you could delete it if you felt inclind to do so
+    //most of the time periodic is unused execpt for putting stuff on the SmartDashboard
   }
 
 
   //defalts to full speed unless a value is given
+  //In Java you can have mutiple methods with the same name IF they require differnet arguments
   public void Shoot(){
     //only ment for auto
     m_shooterMotorLeft.set(1);

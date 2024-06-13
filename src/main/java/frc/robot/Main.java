@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.RobotBase;
  * you are doing, do not modify this file except to change the parameter class to the startRobot
  * call.
  */
+
+//New programers: most of the time you should NOT doing stuff in this file
 public final class Main {
   private Main() {}
 

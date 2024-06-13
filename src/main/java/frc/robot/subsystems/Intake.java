@@ -17,18 +17,16 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
 
   // one neo to spin intake and one to move intake
-  // two limit switchs for in/out pos of intake, likly on the motor controller
-  // itself
-  // possiblity of limit switch to detect if the intake is full
+  // two limit switchs for in/out pos of intake on the motor controller itself
+  //  limit switch to detect if the intake is full
 
   private CANSparkMax m_spinMotor;
   private CANSparkMax m_liftMotor;
 
-  // based on what I have read Limit Switchs stop the motor on there own without
-  // any code from me, further testing/research is needed
-  private SparkLimitSwitch m_forwardLimit;
-  private SparkLimitSwitch m_reverseLimit;
-  private SparkLimitSwitch m_isNoteIn;
+  // Limit Switchs stop the motor on there own without any code from me
+  private SparkLimitSwitch m_forwardLimit; //Triggers when intake is fully out
+  private SparkLimitSwitch m_reverseLimit;//Triggers when intake is fully in
+  private SparkLimitSwitch m_isNoteIn;//Triggers when note is in the intake
 
   public Intake() {
     m_spinMotor = new CANSparkMax(CANIDConstants.kINTAKE_SPIN_MOTOR_ID, MotorType.kBrushless);
@@ -63,7 +61,6 @@ public class Intake extends SubsystemBase {
     m_spinMotor.set(-1);
   }
 
-  // the reason for .2 is to test the limit switch before having it go fast
   public void deployIntake() {
     m_liftMotor.set(.9);
   }
@@ -76,7 +73,7 @@ public class Intake extends SubsystemBase {
     m_liftMotor.set(-.6);
   }
 
-//IsOut and isIn might be sending the wrong limitswitch, testing should be done.
+
 public boolean isOut(){
   return m_forwardLimit.isPressed();
 }

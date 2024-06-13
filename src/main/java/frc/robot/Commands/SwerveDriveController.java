@@ -20,6 +20,7 @@ public class SwerveDriveController extends SwerveControllerCommand {
   private Trajectory m_trajectory;
   private boolean m_resetOdometry;
 
+  // dont do this, It did work but it is NOT WORTH the extra hassle to get it to work. 
   public SwerveDriveController(Trajectory trajectory, boolean resetOdometry, DriveSubsystem drive, ProfiledPIDController thetaController) {
 
     super(trajectory, drive::getPose, DriveConstants.kDriveKinematics, 

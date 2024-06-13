@@ -36,11 +36,14 @@ import frc.robot.Libraries.ConsoleAuto;
 import frc.robot.Libraries.StepState;
 
 //I know it is not ideal but my plan is to make the most simplfied version of the older junk I made last year.
-//Comp is in 4 days so functional is more important then best practice.
+//Comp is in 4 days so functional is more important then best practice. As such the Autonomous class is completly unused see robot container for what it does during auto.
+
 public class Autonomous extends SubsystemBase {
+  // Enums are ways to store data in an easy to acesse format
+
   enum Paths {
-    BASIC(0, 0, 2.5, 0),
-    BEND(0, 0, 1, .5, 2, 0);
+    BASIC(0, 0, 2.5, 0), // a basic strait line
+    BEND(0, 0, 1, .5, 2, 0);// this path should make a "C" shape
 
     private final double m_dStartX;
     private final double m_DStartY;
@@ -49,6 +52,8 @@ public class Autonomous extends SubsystemBase {
     private final double m_dEndX;
     private final double m_dEndY;
 
+    // the reason there is two construsters is because the basic path didnt include
+    // a mid point in the data it has to calaulate the mid point.
     private Paths(double dStartX, double dStartY, double dEndX, double dEndY) {
       this.m_dStartX = dStartX;
       this.m_DStartY = dStartY;
@@ -93,9 +98,24 @@ public class Autonomous extends SubsystemBase {
   }
 
   /** Creates a new Autonomous. */
+  // Much of what will make this code long and complex is to make it more flexable
+  // in how it fuctions.
+  // How it works is an arbitrary amount of Steps (each with there own command) is
+  // created by the programmer.
+  // At the start of auto a list of Steps is selected from a list of lists (2D
+  // array) based off of a ROT switch on the Console
+  // the Console also has Switchs that can be assined to a step, if the Switch is
+  // off the step will be skiped.
+  // That list of Steps(Commands) will be ran one at a time until the list has
+  // been finished
+  // at the same time the Shuffleboard will be updated with the status of each
+  // step ("PEND","ACTV","DONE","SKIP","NULL")
   private DriveSubsystem m_drive;
 
+  // See AutonomousCommandSelector.java but to over simplfy m_autoCommand stores
+  // any Steps made as Commands in a Hashmap until they are called to be used.
   AutonomousCommandSelector<AutonomousSteps> m_autoCommand;
+  // creating Strings to be used to update the Shuffleboard
   private String kAUTO_TAB = "Autonomous";
   private String kSTATUS_PEND = "PEND";
   private String kSTATUS_ACTIVE = "ACTV";
@@ -103,21 +123,26 @@ public class Autonomous extends SubsystemBase {
   private String kSTATUS_SKIP = "SKIP";
   private String kSTATUS_NULL = "NULL";
 
-  private int kSTEPS = 5;
+  private int kSTEPS = 5; // I am 90% sure that this is the number of possible satus for a step
   private boolean kRESET_ODOMETRY = true;
 
-  ConsoleAuto m_ConsoleAuto;
-  AutonomousCommands m_autoSelectCommand[] = AutonomousCommands.values();
+  ConsoleAuto m_ConsoleAuto; // this is were we get console from - see ConsoleAuto.java for more info about
+                             // it
+  AutonomousCommands m_autoSelectCommand[] = AutonomousCommands.values(); // see AutonomousCommands.java this is an Enum
+                                                                          // that stores the names of each list of steps
   AutonomousCommands m_selectedCommand;
 
-  private String m_strCommand = " ";
+  private String m_strCommand = " "; // used later to store the name of the current command
+
+  // used to update the Shuffleboard on the status and name of the steps being
+  // done.
   private String[] m_strStepList = { "", "", "", "", "" };
   private boolean[] m_bStepSWList = { false, false, false, false, false };
   private String[] m_strStepStatusList = { "", "", "", "", "" };
-
+  // makes a new Shuffleboard Tab Expicitly for auto
   private ShuffleboardTab m_tab = Shuffleboard.getTab(kAUTO_TAB);
 
-  // private final SimpleWidget m_autoCmd = m_tab.add("Selected Pattern", "");
+  // the next 100 lines are just adding a bunch of data to the Shuffleboard
   private GenericEntry m_autoCmd = m_tab.add("Selected Pattern", "")
       .withPosition(0, 0)
       .withSize(2, 1)
@@ -220,6 +245,7 @@ public class Autonomous extends SubsystemBase {
           .withWidget(BuiltInWidgets.kTextView)
           .getEntry()
   };
+
   private int m_iPatternSelect;
 
   private Command m_currentCommand;
@@ -237,16 +263,22 @@ public class Autonomous extends SubsystemBase {
   private StepState m_stepWaitForCount;
   private StepState m_stepDrive3Path;
 
-  private SwerveDriveController m_drivePath;
-  private StepState m_stepDrivePath;
+  // for every step their has to be a Command(what is ran) and StepState (Stores
+  // The name and if that step was givin a switch to enable/disable it) see
+  // StepState.java
+  private SwerveDriveController m_drivePath; // the Command
+  private StepState m_stepDrivePath; // the StepState
   private SwerveDriveController m_testReadFilePath;
   private StepState m_stepTestReadFile;
 
   private Command m_turnPath;
   private StepState m_stepturnPath;
-  //private String m_path1JSON = "output/Blue center.wpilib.json";
- // private String m_pathb2JSON = "output/blue drive out.wpilib.json";
-  //private String m_pathB1JSON = "output/Red"
+
+  // Unsuccesful attemt at using the tool PathWeaver, It would generate a path but
+  // we were unable to get the robot to run the path.
+  // private String m_path1JSON = "output/Blue center.wpilib.json";
+  // private String m_pathb2JSON = "output/blue drive out.wpilib.json";
+  // private String m_pathB1JSON = "output/Red"
   private Trajectory m_trajPath1;
 
   private AutonomousSteps m_currentStepName;
@@ -266,8 +298,14 @@ public class Autonomous extends SubsystemBase {
     m_stepWait2Sw1 = new StepState(AutonomousSteps.WAIT2, m_ConsoleAuto.getSwitchSupplier(1));
     m_stepWait2Sw2 = new StepState(AutonomousSteps.WAIT2, m_ConsoleAuto.getSwitchSupplier(2));
 
-    m_stepWaitForCount = new StepState(AutonomousSteps.WAITLOOP);
+    m_stepWaitForCount = new StepState(AutonomousSteps.WAITLOOP); // setting the StepState has 2 options A. just the
+                                                                  // Name of the step from the AutonomousSteps Enum
+    // or B. that and a switch supplier if you want the step to be able to be turned
+    // on/off before a match.
 
+    // In order to drive during Auto with a swerve robot you need to use a command called SwerveControllerCommand
+    // It needs a Trajectory, ProfiledPIDController and a pid controller for x and y. the way it was done here is Awful. a new command was made called SwerveDriveController.java
+    // It extends the command we need and uses a super to pass the PIDcontrollers the SwerveControllerCommand. We would have been better off without doing that.
     var thetaController = new ProfiledPIDController(2, 0, 0, new Constraints(5, 1));
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -277,15 +315,16 @@ public class Autonomous extends SubsystemBase {
     m_stepDrivePath = new StepState(AutonomousSteps.DRIVE,
         m_ConsoleAuto.getSwitchSupplier(3));
 
+//this is from the attempt to get Path weaver to work, genTrajectory(Paths.BASIC) will need to be replaced with readPaths(String jsonPath)
     m_testReadFilePath = new SwerveDriveController(genTrajectory(Paths.BASIC), kRESET_ODOMETRY, drive, thetaController);
     m_autoCommand.addOption(AutonomousSteps.TEST, m_testReadFilePath);
     m_stepTestReadFile = new StepState(AutonomousSteps.TEST);
 
+    // this is the array of possible paths currently only has 1 option but could have as many as we want.
     m_cmdSteps = new StepState[][] {
         { m_stepWaitForCount, m_stepDrivePath }
         // { m_stepWaitForCount, m_stepTestReadFile }
         // { m_stepWaitForCount, m_stepturnPath }
-        // { m_stepWaitForCount, m_stepMoveArm, m_stepPlaceConeM, m_stepDrive3Path }
     };
   }
 
@@ -320,14 +359,19 @@ public class Autonomous extends SubsystemBase {
       autoSelectIx = 0;
       m_iPatternSelect = 0;
     }
+    // gets the choice of auto from the Console and if that choice is not one of the possible auto path it defaults to 0.
 
-   // boolean isAllianceRed = (DriverStation.getAlliance().get() == DriverStation.Alliance.Red);
-    //m_allianceColor.setBoolean(isAllianceRed);
- m_allianceColor.setBoolean(true);
+    // boolean isAllianceRed = (DriverStation.getAlliance().get() ==
+    // DriverStation.Alliance.Red); // a failed try at getting the alliance color of the current match.
+    // m_allianceColor.setBoolean(isAllianceRed);
+    m_allianceColor.setBoolean(true);
+
+    // gets the name of the path to use
     m_selectedCommand = m_autoSelectCommand[autoSelectIx];
     m_strCommand = m_selectedCommand.toString();
     m_autoCmd.setString(m_strCommand);
 
+    // updates the values used for the Shuffleboard with the names
     for (int ix = 0; ix < m_cmdSteps[autoSelectIx].length; ix++) {
       m_strStepList[ix] = m_cmdSteps[autoSelectIx][ix].getStrName();
       m_bStepSWList[ix] = m_cmdSteps[autoSelectIx][ix].isTrue();
@@ -338,13 +382,13 @@ public class Autonomous extends SubsystemBase {
       m_bStepSWList[ix] = false;
       m_strStepStatusList[ix] = "";
     }
-
     for (int ix = 0; ix < kSTEPS; ix++) {
       m_step[ix].setString(m_strStepList[ix]);
       m_sw[ix].setValue(m_bStepSWList[ix]);
       m_st[ix].setString(m_strStepStatusList[ix]);
     }
 
+    //gets the amount of time to wait befor starting the rest of the path
     m_iWaitCount = m_ConsoleAuto.getROT_SW_1();
     m_iWaitLoop.setValue(m_iWaitCount);
 
@@ -356,18 +400,18 @@ public class Autonomous extends SubsystemBase {
   }
 
   public Command getWaitCommand(double seconds) {
-    return Commands.waitSeconds(seconds);
+    return Commands.waitSeconds(seconds); //return a command to wait some number of seconds
   }
 
   public Command getNextCommand() {
     m_currentStepName = null;
     m_currentCommand = null;
     String completionAction = kSTATUS_DONE;
-
+// returns the next Command to do
     while (m_currentCommand == null && !m_bIsCommandDone) {
       m_currentStepName = getNextActiveCommand(completionAction);
       if (m_currentStepName != null) {
-        switch (m_currentStepName) {
+        switch (m_currentStepName) { //this switch statment shouldnt be here because all the commands should have already be created abouve not here.
           case WAIT1:
             m_currentCommand = getWaitCommand(1);
             break;

@@ -7,16 +7,19 @@ import edu.wpi.first.wpilibj.GenericHID;
 
 /** Add your docs here. */
 public class ConsoleTele extends GenericHID {
-
+    // like ConsoleAuto but meant for teleop and reads the left half of the switchs
+    // on the box
     private static final int kROV_SW_0 = 0;
     private static final int kROV_SW_1 = 1;
 
     public ConsoleTele(final int port) {
         super(port);
     }
-public double getPo(int button){
-    return this.getRawAxis(button);
-}
+
+    public double getPo(int button) {
+        return this.getRawAxis(button);
+    }
+
     public int getROT_SW_0() {
         return this.getPOV(kROV_SW_0) / 45;
     }

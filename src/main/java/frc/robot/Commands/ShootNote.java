@@ -18,7 +18,8 @@ public class ShootNote extends Command {
   private Shooter m_shooter;
   private Intake m_Intake;
 private Timer m_timer = new Timer();
-private ConsoleTele m_Tele = new ConsoleTele(2);
+//private ConsoleTele m_Tele = new ConsoleTele(2); this is from any experiment to try different shooter speeds, we settled on .9. I took it out because It got bumped during a match
+// and we didnt realize that this was why the shooter acted wierd until after the match, We were unable to shoot.
   public ShootNote(Shooter shooter, Intake intake) {
 m_shooter = shooter;
 m_Intake = intake;
@@ -31,9 +32,9 @@ m_Intake = intake;
   public void initialize() {
     m_timer.reset();
     m_timer.start();
-    m_shooter.Shoot(m_Tele.getPo(0));
+    m_shooter.Shoot(.9);
   }
-
+// it starts the spin motors, gives them time to spin up then pushes the Note into the shooter.
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
