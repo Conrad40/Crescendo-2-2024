@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 
 /** Add your docs here. */
 public class ConsoleAuto extends GenericHID {
-
+// like ConsoleTele but meant for Auto and reads the right half of the switchs on the box
     private static final int kROV_SW_0 = 0;
     private static final int kROV_SW_1 = 1;
 

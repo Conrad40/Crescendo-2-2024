@@ -9,7 +9,7 @@ import frc.robot.subsystems.Shooter;
 
 
 public class AutoControl extends Command {
-
+// Runs Auto based off of what it gets from the Autonomous subsystem
     private Command m_currentCommand;
     private Autonomous m_autonomous;
     private DriveSubsystem m_drive;

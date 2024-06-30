@@ -61,6 +61,7 @@ public class RobotContainer {
         private final ConsoleAuto m_consoleAuto = new ConsoleAuto(OIConstants.kAUTONOMOUS_CONSOLE_PORT);
 
         private final Autonomous m_autonomous = new Autonomous(m_consoleAuto, m_robotDrive,m_Shooter,m_Intake);// due to time contraits I gave up on doing auto the fancy way these three lines and the 
+
         // autonomous files simply are no longer used in code. However I did not delete them due to the amout of time it would take. You can now use them as examples of what to do.
         private final AutoSelect m_autoSelect = new AutoSelect(m_autonomous);
         private final AutoControl m_autoCommand = new AutoControl(m_autonomous, m_robotDrive,m_Shooter,m_Intake);

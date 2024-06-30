@@ -13,7 +13,8 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 /** Add your docs here. */
 public class AutonomousCommandSelector<K> {
-
+//Stores the names and commands of any potental step 
+//and returns the command when ever needed.
     private final Map<K, Command> m_autoCommand = new HashMap<>();
     private K m_defaultChoice = null;
 
